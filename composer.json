@@ -1,0 +1,30 @@
+{
+  "name": "jufist/wp-core",
+  "description": "Wordpress Core. The plugin allow you to dev WP plugins faster",
+  "version": "1.0.0",
+  "keywords": [
+    "wordpress",
+    "base",
+    "prototype"
+  ],
+  "homepage": "https://github.com/jufist/wp-core",
+  "license": "MIT",
+  "require": {
+    "php": ">=5.6.20"
+  },
+  "authors": [
+    {
+      "name": "Oliver Huynh",
+      "email": "oliver@jufist.com",
+      "homepage": "https://jufist.com"
+    }
+  ],
+  "autoload": {
+	  "psr-4": {
+            "Jufist\\": "src/Jufist/"
+        },
+    "classmap": [
+      "src/Jufist/WpCore/WpCore.php"
+    ]
+  }
+}
