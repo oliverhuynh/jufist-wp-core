@@ -2,6 +2,19 @@
 
 `composer require jufist/wp-core`
 
+Composer.json
+```
+"repositories": [
+    {
+        "type": "path",
+        "url": "/my-projects/jufist-wp-core",
+	"options": {
+            "symlink": false
+        }
+    }
+],
+```
+
 
 ## Usage
 
