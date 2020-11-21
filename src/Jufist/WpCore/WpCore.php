@@ -9,6 +9,8 @@ namespace Jufist\WpCore;
  */
 class WpCore { 
     private static $instance;
+    private $file;
+
     static function GetInstance()
     {
         if (!isset(self::$instance)) {
@@ -44,7 +46,7 @@ class WpCore {
             return $schedules;
         });
         add_action('init', [$this, 'InitCron']);
-        register_deactivation_hook(__FILE__, [$this, 'InitCronDeactivate']);
+        register_deactivation_hook($this->$file, [$this, 'InitCronDeactivate']);
     }
 
     function InitCronDeactivate()
@@ -100,7 +102,7 @@ class WpCore {
 
         wp_enqueue_script(
             'no_script',
-            plugins_url('/dist/index.js', __FILE__),
+            plugins_url('/dist/index.js', $this->$file),
             ['jquery'],
             1.28,
             true
@@ -123,6 +125,8 @@ class WpCore {
 
     public function InitPlugin()
     {
+	 $reflector = new \ReflectionClass(get_class($this));
+	 $this->$file = $reflector->getFileName();
         $this->basic();
     }
 }
