@@ -124,7 +124,5 @@ class WpCore {
     public function InitPlugin()
     {
         $this->basic();
-        // $this->InitDebug();
-        $this->InitPDF();
     }
 }
