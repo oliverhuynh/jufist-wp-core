@@ -2,21 +2,24 @@
 
 namespace Jufist\WpCore;
 
+
 /**
  * Description of WpCore
  *
  * @author Oliver Huynh
  */
 class WpCore { 
-    private static $instance;
     private $file;
+    private static $instance = [];
 
     static function GetInstance()
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new static();
-        }
-        return self::$instance;
+	    $id = get_called_class();
+	    if (!isset(self::$instance[$id])) {
+	      self::$instance[$id] = new static();    
+	    }
+	    
+	    return self::$instance[$id];
     }
 
         public function basic()
@@ -27,8 +30,8 @@ class WpCore {
             }
         });
 
-        add_action('wp_enqueue_scripts', [$this, 'InitAssets']);
-        add_action('admin_enqueue_scripts', [$this, 'InitAssets']);
+        add_action('wp_enqueue_scripts', [$this, 'InitAssets'], 999);
+        add_action('admin_enqueue_scripts', [$this, 'InitAssets'], 999);
 
         // Cron
         if (method_exists($this, 'jufistcron')) {
@@ -46,7 +49,7 @@ class WpCore {
             return $schedules;
         });
         add_action('init', [$this, 'InitCron']);
-        register_deactivation_hook($this->$file, [$this, 'InitCronDeactivate']);
+        register_deactivation_hook($this->file, [$this, 'InitCronDeactivate']);
     }
 
     function InitCronDeactivate()
@@ -92,6 +95,8 @@ class WpCore {
         }
     }
 
+
+    public $version=1.28;
     function InitAssets($hook)
     {
         static $added;
@@ -99,23 +104,77 @@ class WpCore {
             return;
         }
         $added = true;
+	$d = dirname($this->file);
+
+	if (!file_exists($d . '/dist/index.js')) {
+		return ;
+	}
 
         wp_enqueue_script(
             'no_script',
-            plugins_url('/dist/index.js', $this->$file),
+            plugins_url('/dist/index.js', $this->file),
             ['jquery'],
-            1.28,
+            $this->version,
             true
         );
     }
-    function addInlineScript($script)
+    function addInlineScript($script, $directly = false)
     {
+	    if ($directly) {
+		    // Print it directly
+		    print "<script type='text/javascript'>$script</script>";
+		    return;
+	    }
         static $id = 0;
         $id++;
-        wp_register_script('dummy-handle-header' + $id, '');
-        wp_enqueue_script('dummy-handle-header' + $id);
-        wp_add_inline_script('dummy-handle-header' + $id, $script);
+        wp_register_script('dummy-handle-header' . $id, '');
+        wp_enqueue_script('dummy-handle-header' . $id);
+        wp_add_inline_script('dummy-handle-header' . $id, $script);
     }
+
+    public $pluginns = "jufist";
+
+    function addVar($varname, $varvalue, $directly = false) {
+		    $pluginns = $this->pluginns;
+		    $script = "var $pluginns = $pluginns || {}; $pluginns.$varname = " .  json_encode($varvalue) .  ';';
+		$this->addInlineScript($script, $directly);
+    }
+
+    function insertVar($varname, $varvalue, $directly = false) {
+	    $pluginns = $this->pluginns;
+	    $script = "var $pluginns = $pluginns || {}; $pluginns.$varname = $pluginns.$varname || []; $pluginns.$varname.push(" .  json_encode($varvalue) . ');';
+        $this->addInlineScript($script, $directly);
+    }
+
+    public function InitHardDebug() {
+	    /* FOR DEBUGGING PURPOSE
+ */
+
+/*
+declare(ticks=1);
+
+function tick_handler() {
+    global $backtrace;
+    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+}
+register_tick_function('tick_handler');
+
+register_shutdown_function(function() use (&$shouldExit) {
+    global $backtrace;
+    if (true || $_SERVER['REQUEST_URI'] == '/wp-login.php') {
+        error_log ('XXX:Something went wrong.' . $_SERVER['REQUEST_URI']);
+
+        error_log(print_r($backtrace, 1));//debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1));
+        return ;
+    }
+    //
+    if (! $shouldExit) {
+        return;
+    }
+});
+*/
+    }
+
     public function InitDebug()
     {
         error_reporting(E_ALL);
@@ -126,7 +185,7 @@ class WpCore {
     public function InitPlugin()
     {
 	 $reflector = new \ReflectionClass(get_class($this));
-	 $this->$file = $reflector->getFileName();
+	 $this->file = $reflector->getFileName();
         $this->basic();
     }
 }
