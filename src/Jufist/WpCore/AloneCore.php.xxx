@@ -1,0 +1,49 @@
+<?php 
+
+namespace Jufist\WpCore;
+
+
+// Load Wordpress library
+$reflection = new \ReflectionClass(\Jufist\WpCore\Core::class);
+$vendorDir = dirname($reflection->getFileName(), 6);
+define( 'ABSPATH', $vendorDir . '/johnpbloch/wordpress-core/');
+define( 'WP_CONTENT_URL', '/');
+// Require wp-settings but not DB checking, remove vars, etc..
+require_once __DIR__ . '/wordpress.light.inc';
+
+/**
+ * Description of WpCore
+ *
+ * @author Oliver Huynh
+ */
+class AloneCore extends Core {
+    public function InitPlugin()
+    {
+        define('WPMU_PLUGIN_DIR', dirname($this->file));
+        define('WP_PLUGIN_DIR', WPMU_PLUGIN_DIR); 
+        define( 'WPMU_PLUGIN_URL', WP_CONTENT_URL . '/extensions' );
+        define('WP_PLUGIN_URL', WPMU_PLUGIN_URL); 
+        wp_cache_set('is_blog_installed', TRUE);
+        wp_cache_set( 'alloptions', [
+            "can_compress_scripts" => 0,
+            "category_base" => FALSE,
+            "tag_base" => FALSE,
+            "permalink_structure" => FALSE,
+            'link_manager_enabled' => FALSE,
+            'siteurl' => 'http://example.com',
+            'sidebars_widgets' => [],
+            'use_smilies' => FALSE,
+            'cron' => FALSE,
+            'home' => ''
+        ], 'options');
+
+        global $wp_filter;
+        unset($wp_filter['widgets_init']);
+        unset($wp_filter['init']);
+        unset($wp_filter['wp_enqueue_scripts']);
+        parent::InitPlugin();
+
+        do_action( 'after_setup_theme' );
+        do_action( 'init' );
+    }
+}

@@ -41,3 +41,14 @@ $yourclass->InitPlugin();
 composer require "jufist/wp-core @dev"
 ```
 
+# For AloneCore
+
+Put these to 3rdparty PHP
+
+```
+wp_head();
+wp_footer();
+```
+
+# For webpack/gulp
+prototype --setup --webpack
