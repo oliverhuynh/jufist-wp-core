@@ -48,12 +48,12 @@ function ol_op_between($item, $values, $placeholder, $or_and, $data) {
 }
 
 function ol_op_great($item, $values, $placeholder, $or_and, $data) {
-  $values = isset($data[$item['key'] . '_great']) && ($data[$item['key'] . '_great'] !== '') ? $data[$item['key'] . '_great'] : -1;
+  $values = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? $data[$item['key'] . '_less'] : -1;
   return [' >= ', $values, $placeholder, $values, $or_and];
 }
 
 function ol_op_less($item, $values, $placeholder, $or_and, $data) {
-  $values = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? $data[$item['key'] . '_less'] : -1;
+  $values = isset($data[$item['key'] . '_great']) && ($data[$item['key'] . '_great'] !== '') ? $data[$item['key'] . '_great'] : -1;
   return [' <= ', $values, $placeholder, $values, $or_and];
 }
 
@@ -140,10 +140,8 @@ function build_where($data, $search_def, $placeholder = '?') {
     foreach ($search_def as $item) {
       if (isset($item['op_auto_key'])) {
         $item['op'] = isset($data[$item['op_auto_key']]) ? $data[$item['op_auto_key']] : 'LIKE';
-        if (!isset($data[$item['op_auto_key']])) {
-          // Disable force because there is no auto_key
-          unset($item['force']);
-        }
+        // Disable force because there is no auto_key
+        $item['force'] = isset($data[$item['op_auto_key']]);     
       }
 
       $value_type = $item['value_type'] ?? '';
