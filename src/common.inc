@@ -48,12 +48,12 @@ function ol_op_between($item, $values, $placeholder, $or_and, $data) {
 }
 
 function ol_op_great($item, $values, $placeholder, $or_and, $data) {
-  $values = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? $data[$item['key'] . '_less'] : -1;
+  $values = isset($data[$item['key'] . '_great']) && ($data[$item['key'] . '_great'] !== '') ? $data[$item['key'] . '_great'] : -1;
   return [' >= ', $values, $placeholder, $values, $or_and];
 }
 
 function ol_op_less($item, $values, $placeholder, $or_and, $data) {
-  $values = isset($data[$item['key'] . '_great']) && ($data[$item['key'] . '_great'] !== '') ? $data[$item['key'] . '_great'] : -1;
+  $values = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? $data[$item['key'] . '_less'] : -1;
   return [' <= ', $values, $placeholder, $values, $or_and];
 }
 
@@ -147,6 +147,12 @@ function build_where($data, $search_def, $placeholder = '?') {
       }
 
       $value_type = $item['value_type'] ?? '';
+
+      // Any handling, reset input
+      if (isset($data[$item['key']]) && $data[$item['key']] == '_') {
+        unset($data[$item['key']]);
+      }
+
       if (isset($data[$item['key']]) || ($item['force'] ?? FALSE)) {
         // Build op, values
         $op = $item['op'] ?? 'LIKE';
