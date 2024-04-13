@@ -126,7 +126,11 @@ function ol_op_in($item, $values, $placeholder, $or_and) {
   return ['IN', $values, $clause, $where_values, $or_and];
 }
 
-function build_sort($postData, $sort_columns, $priority_sort = '') {
+function build_sort($postData, $sort_columns, $priority_sort = '', $options = []) {
+    $options += [
+      'default_sort' => '',
+    ];
+    extract($options);
     $first_col = $sort_columns[0];
     $sort_order = isset($postData['order']) ? $postData['order'] : [];
     $sort = implode(', ', array_filter(array_merge([$priority_sort], array_map(function ($order) use ($sort_columns, $first_col) {
@@ -136,7 +140,7 @@ function build_sort($postData, $sort_columns, $priority_sort = '') {
         return "$col_name $dir";
     }, $sort_order))));
 
-    $sort = $sort ? "ORDER BY $sort" : "";
+    $sort = $sort ? "ORDER BY $sort" : ($default_sort ? "ORDER BY $default_sort" : "");
     return $sort;
 }
 
