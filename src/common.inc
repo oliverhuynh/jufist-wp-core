@@ -37,23 +37,33 @@ function db_like($string) {
 }
 
 function ol_op_between($item, $values, $placeholder, $or_and, $data) {
-  $value1 = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? $data[$item['key'] . '_less'] : -1;
-  $value2 = isset($data[$item['key'] . '_great'])  && ($data[$item['key'] . '_great'] !== '')? $data[$item['key'] . '_great'] : -1;
+  $value1 = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? floatval($data[$item['key'] . '_less']) : -1;
+  $value2 = isset($data[$item['key'] . '_great'])  && ($data[$item['key'] . '_great'] !== '')? floatval($data[$item['key'] . '_great']) : -1;
   $values = [$value1, $value2];
   if (in_array(-1, [$value1, $value2])) {
     $values = -1;
   }
   
+  if ($placeholder === '%s') {
+    $placeholder = '%f';
+  }
+
   return [' BETWEEN ', $values, "$placeholder AND $placeholder", ['single'], $or_and];
 }
 
 function ol_op_great($item, $values, $placeholder, $or_and, $data) {
-  $values = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? $data[$item['key'] . '_less'] : -1;
+  $values = isset($data[$item['key'] . '_less']) && ($data[$item['key'] . '_less'] !== '') ? floatval($data[$item['key'] . '_less']) : -1;
+  if ($placeholder === '%s') {
+    $placeholder = '%f';
+  }
   return [' >= ', $values, $placeholder, $values, $or_and];
 }
 
 function ol_op_less($item, $values, $placeholder, $or_and, $data) {
-  $values = isset($data[$item['key'] . '_great']) && ($data[$item['key'] . '_great'] !== '') ? $data[$item['key'] . '_great'] : -1;
+  $values = isset($data[$item['key'] . '_great']) && ($data[$item['key'] . '_great'] !== '') ? floatval($data[$item['key'] . '_great']) : -1;
+  if ($placeholder === '%s') {
+    $placeholder = '%f';
+  }
   return [' <= ', $values, $placeholder, $values, $or_and];
 }
 
