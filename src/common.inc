@@ -170,6 +170,7 @@ function build_where($data, $search_def, $placeholder = '?') {
         $op = $item['op'] ?? 'LIKE';
 
         $orig_value = $data[$item['key']] ?? FALSE;
+
         $values = $orig_value;
         if (isset($item['op_auto_in_value']) && $orig_value) {
           list ($op, $orig_value) = explode("|", $orig_value . "|");
@@ -187,6 +188,13 @@ function build_where($data, $search_def, $placeholder = '?') {
         // Make sure values is array for args
         $values = is_array($values) ? $values : [$values];
         $where_values = is_array($where_values) ? $where_values : [$where_values];
+
+        // Skip blank if op is LIKE
+        if ("$op" === "LIKE" && !count(array_filter($where_values ?? [], function($it) {
+          return !($it === '%%' || !$it);
+        }))) {
+          continue ;
+        }
 
         // Build inner_where
         $inner_vwhere = [];
