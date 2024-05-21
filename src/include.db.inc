@@ -10,10 +10,6 @@ use Twig\Loader\FilesystemLoader;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 
-// Set up Twig
-$loader = new FilesystemLoader(SQM_ROOT . '/ol_templates');
-$twig = new Environment($loader);
-
 $request = Request::createFromGlobals();
 $postData = (array) $request->request->all();
 
