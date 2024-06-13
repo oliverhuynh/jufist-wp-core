@@ -35,14 +35,26 @@ if (file_exists($wp_config_path)) {
   preg_match("/define\s*\(\s*'DB_HOST'\s*,\s*'([^']+)'\s*\);/", $wp_config_content, $matches);
   $host = isset($matches[1]) ? $matches[1] : '';
 
+  preg_match("/define\s*\(\s*'DB_DRIVER'\s*,\s*'([^']+)'\s*\);/", $wp_config_content, $matches);
+  $db_driver = isset($matches[1]) ? $matches[1] : '';
+
+  $driver = $db_driver ?? 'mysqli';
+
   // Create database credentials array
   $database_credentials = [
         'dbname'   => $dbname,
         'user'     => $user,
         'password' => $password,
         'host'     => $host,
-        'driver'   => 'mysqli',
+        'driver'   => $driver
+  ];
+
+  if ($driver == 'pdo_sqlite') {
+    $database_credentials = [
+        'path'   => $dbname,// For pdo_sqlite
+        'driver'   => $driver
     ];
+  }
 
   // Create a Doctrine\DBAL\Configuration object
   $config = new Configuration();
