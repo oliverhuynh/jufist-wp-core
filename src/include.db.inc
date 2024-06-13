@@ -50,6 +50,7 @@ if (file_exists($wp_config_path)) {
   ];
 
   if ($driver == 'pdo_sqlite') {
+    $db_rel = getcwd() == OL_ROOT ? '' : '../';
     $database_credentials = [
         'path'   => $dbname,// For pdo_sqlite
         'driver'   => $driver
