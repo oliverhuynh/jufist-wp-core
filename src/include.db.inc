@@ -38,7 +38,7 @@ if (file_exists($wp_config_path)) {
   preg_match("/define\s*\(\s*'DB_DRIVER'\s*,\s*'([^']+)'\s*\);/", $wp_config_content, $matches);
   $db_driver = isset($matches[1]) ? $matches[1] : '';
 
-  $driver = $db_driver ?? 'mysqli';
+  $driver = $db_driver ? $db_driver : 'mysqli';
 
   // Create database credentials array
   $database_credentials = [
